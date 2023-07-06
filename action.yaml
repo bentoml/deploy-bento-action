@@ -1,0 +1,80 @@
+name: "Deploy Bento"
+description: "Build and Deploy Bento to Cloud"
+inputs:
+  bentoml_version:
+    description: The version of BentoML to use. Leave it empty to use the latest version
+    required: false
+    default: ""
+  cloud_api_token:
+    description: "An API token generated from the cloud console"
+    required: true
+  cloud_endpoint:
+    description: "The endpoint URL of Yatai or BentoCloud"
+    required: true
+  bento_version:
+    description: "The version of Bento Build or leave it empty to use a random string"
+    required: false
+    default: ""
+  deployment_config:
+    description: "The path to the JSON deployment config"
+    required: false
+    default: "deployment.json"
+outputs:
+  bento_repository:
+    description: "The name of the Bento repository"
+    value: ${{ steps.build.outputs.BENTO_NAME }}
+  bento_version:
+    description: "The version of the built Bento"
+    value: ${{ steps.build.outputs.BENTO_VERSION }}
+  bento_tag:
+    description: "The tag of the Bento"
+    value: ${{ steps.build.outputs.BENTO_TAG }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: |
+        apt-get update && apt-get install jq
+        if [[ -n "${{ inputs.bentoml_version }}" ]]; then
+          pip install -U "bentoml==${{ inputs.bentoml_version }}"
+        else
+          pip install -U bentoml
+        fi
+
+    - name: Login to Bento Cloud
+      shell: bash
+      run: |
+        echo "Login to Cloud Console at ${{ inputs.cloud_endpoint }}"
+        bentoml cloud login --api-token ${{ inputs.cloud_api_token }} --endpoint ${{ inputs.cloud_endpoint }}
+
+    - name: Pull models
+      shell: bash
+      run: bentoml models pull
+
+    - name: Build and push
+      id: build
+      shell: bash
+      run: |
+        if [[ -n "${{ inputs.bento_version }}" ]]; then
+          build_args=(--version ${{ inputs.bento_version }})
+        else
+          build_args=()
+        fi
+        bento_tag=$(bentoml build -o tag "$build_args[@]")
+        echo "BENTO_TAG=$bento_tag" >> $GITHUB_OUTPUT
+        echo "BENTO_NAME=$(echo $bento_tag | cut -d: -f1)" >> $GITHUB_OUTPUT
+        echo "BENTO_VERSION=$(echo $bento_tag | cut -d: -f2)" >> $GITHUB_OUTPUT
+        bentoml push $bento_tag
+
+    - name: Deploy
+      shell: bash
+      run: |
+        jq '.targets[0].bento_repository = "${{ steps.build.outputs.BENTO_NAME }}" | .targets[0].bento = "${{ steps.build.outputs.BENTO_VERSION }}"' \
+          ${{ inputs.deployment_config }} > /tmp/deployment-updated.yaml
+        bentoml deployment update -f /tmp/deployment-updated.yaml
+
+branding:
+  icon: upload-cloud
+  color: gray-dark
