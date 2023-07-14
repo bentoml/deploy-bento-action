@@ -19,6 +19,11 @@ inputs:
     description: "The path to the JSON deployment config"
     required: false
     default: "deployment.json"
+  action:
+    description: "Choose the action for the deployment: 'create' or 'update'"
+    required: false
+    default: "update"
+
 outputs:
   bento_repository:
     description: "The name of the Bento repository"
@@ -68,12 +73,19 @@ runs:
         echo "BENTO_VERSION=$(echo $bento_tag | cut -d: -f2)" >> $GITHUB_OUTPUT
         bentoml push $bento_tag
 
-    - name: Deploy
+    - name: Update deployment
       shell: bash
+      if: inputs.action == 'update'
       run: |
         jq '.targets[0].bento_repository = "${{ steps.build.outputs.BENTO_NAME }}" | .targets[0].bento = "${{ steps.build.outputs.BENTO_VERSION }}"' \
           ${{ inputs.deployment_config }} > /tmp/deployment-updated.yaml
         bentoml deployment update -f /tmp/deployment-updated.yaml
+
+    - name: Create deployment
+      shell: bash
+      if: inputs.action == 'create'
+      run: |
+        bentoml deployment create -f ${{ inputs.deployment_config }}
 
 branding:
   icon: upload-cloud
