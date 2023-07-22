@@ -37,7 +37,8 @@ jobs:
 | `bentoml_version`   | The version of bentoml to use                                       | No       | latest            |
 | `bento_version`     | The version of Bento Build or leave it empty to use a random string | No       | Generated         |
 | `deployment_config` | The path to the JSON deployment config                              | No       | `deployment.json` |
-| `action`            | Choose the action for the deployment: 'create' or 'update'          | No       | 'update'          |
+| `deployment_name`   | The name of the deployment, required if action is 'update'          | No       | N/A               |
+| `action`            | Choose the action for the deployment: 'create', 'update', 'skip'    | No       | 'update'          |
 
 ## Action Outputs
 

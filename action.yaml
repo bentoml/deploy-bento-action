@@ -19,8 +19,12 @@ inputs:
     description: "The path to the JSON deployment config"
     required: false
     default: "deployment.json"
+  deployment_name:
+    description: "The name of the deployment, required if action is 'update'"
+    required: false
+    default: ""
   action:
-    description: "Choose the action for the deployment: 'create' or 'update'"
+    description: "Choose the action for the deployment: 'create', 'update', 'skip'"
     required: false
     default: "update"
 
@@ -45,7 +49,7 @@ runs:
         if [[ -n "${{ inputs.bentoml_version }}" ]]; then
           pip install -U "bentoml==${{ inputs.bentoml_version }}"
         else
-          pip install -U bentoml
+          pip install -U "bentoml>=1.0.25"
         fi
 
     - name: Login to Bento Cloud
@@ -77,9 +81,7 @@ runs:
       shell: bash
       if: inputs.action == 'update'
       run: |
-        jq '.targets[0].bento_repository = "${{ steps.build.outputs.BENTO_NAME }}" | .targets[0].bento = "${{ steps.build.outputs.BENTO_VERSION }}"' \
-          ${{ inputs.deployment_config }} > /tmp/deployment-updated.yaml
-        bentoml deployment update -f /tmp/deployment-updated.yaml
+        bentoml deployment update --name ${{ inputs.deployment_name }}
 
     - name: Create deployment
       shell: bash
