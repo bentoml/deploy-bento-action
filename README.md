@@ -22,8 +22,9 @@ jobs:
           cache: 'pip'
 
       - name: Build and Deploy
-        uses: bentoml/deploy-bento-action
+        uses: bentoml/deploy-bento-action@main
         with:
+          deployment_name: test-iris
           cloud_api_token: ${{ secrets.CLOUD_API_TOKEN }}
           cloud_endpoint: ${{ secrets.CLOUD_ENDPOINT }}
 ```
