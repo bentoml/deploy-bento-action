@@ -72,7 +72,8 @@ runs:
         else
           build_args=()
         fi
-        bento_tag=$(bentoml build -o tag "$build_args[@]")
+        bento_tag=$(bentoml build -o tag ${build_args[@]})
+        bento_tag=${bento_tag##__tag__:}
         echo "BENTO_TAG=$bento_tag" >> $GITHUB_OUTPUT
         echo "BENTO_NAME=$(echo $bento_tag | cut -d: -f1)" >> $GITHUB_OUTPUT
         echo "BENTO_VERSION=$(echo $bento_tag | cut -d: -f2)" >> $GITHUB_OUTPUT
