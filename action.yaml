@@ -50,6 +50,8 @@ runs:
         else
           pip install -U "bentoml>=1.0.25"
         fi
+        echo "Successfully installed BentoML"
+        bentoml --version
 
     - name: Login to Bento Cloud
       shell: bash
@@ -70,7 +72,6 @@ runs:
         else
           build_args=()
         fi
-        set +x
         bento_tag=$(bentoml build -o tag "$build_args[@]")
         echo "BENTO_TAG=$bento_tag" >> $GITHUB_OUTPUT
         echo "BENTO_NAME=$(echo $bento_tag | cut -d: -f1)" >> $GITHUB_OUTPUT
