@@ -70,6 +70,7 @@ runs:
         else
           build_args=()
         fi
+        set +x
         bento_tag=$(bentoml build -o tag "$build_args[@]")
         echo "BENTO_TAG=$bento_tag" >> $GITHUB_OUTPUT
         echo "BENTO_NAME=$(echo $bento_tag | cut -d: -f1)" >> $GITHUB_OUTPUT
@@ -80,7 +81,7 @@ runs:
       shell: bash
       if: inputs.action == 'update'
       run: |
-        bentoml deployment update --name ${{ inputs.deployment_name }}
+        bentoml deployment update --name ${{ inputs.deployment_name }} --bento ${{ steps.build.outputs.BENTO_TAG }}
 
     - name: Create deployment
       shell: bash
