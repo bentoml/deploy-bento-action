@@ -45,7 +45,6 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        apt-get update && apt-get install jq
         if [[ -n "${{ inputs.bentoml_version }}" ]]; then
           pip install -U "bentoml==${{ inputs.bentoml_version }}"
         else
