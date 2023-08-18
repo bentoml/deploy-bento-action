@@ -42,16 +42,10 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Install dependencies
-      shell: bash
-      run: |
-        if [[ -n "${{ inputs.bentoml_version }}" ]]; then
-          pip install -U "bentoml==${{ inputs.bentoml_version }}"
-        else
-          pip install -U "bentoml>=1.0.25"
-        fi
-        echo "Successfully installed BentoML"
-        bentoml --version
+    - uses: bentoml/setup-bentoml-action@v1
+      with:
+        python-version: "3.8"
+        bentoml-version: ${{ inputs.bentoml_version }}
 
     - name: Login to Bento Cloud
       shell: bash
