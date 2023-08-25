@@ -57,18 +57,18 @@ jobs:
 
 ## Action Inputs
 
-| Name                | Description                                                         | Required | Default           |
-| ------------------- | ------------------------------------------------------------------- | -------- | ----------------- |
-| `cloud_api_token`   | An API token generated from the cloud console                       | Yes      | N/A               |
-| `cloud_endpoint`    | The endpoint URL of Yatai or BentoCloud                             | Yes      | N/A               |
-| `bentoml_version`   | The version of bentoml to use                                       | No       | latest            |
-| `bento_version`     | The version of Bento Build or leave it empty to use a random string | No       | Generated         |
-| `bento_tag`         | Whether to build the bento with this action or not.  | No       | True         |
-| `bento_tag`         | Optional tag to pass for this action. This is required when `build=true` | No       | N/A         |
-| `bento_version`     | The version of Bento Build or leave it empty to use a random string | No       | Generated         |
-| `deployment_config` | The path to the JSON deployment config                              | No       | `deployment.json` |
-| `deployment_name`   | The name of the deployment, required if action is 'update'          | No       | N/A               |
-| `action`            | Choose the action for the deployment: 'create', 'update', 'skip'    | No       | 'update'          |
+| Name                | Description                                                              | Required | Default           |
+|---------------------|--------------------------------------------------------------------------|----------|-------------------|
+| `cloud_api_token`   | An API token generated from the cloud console                            | Yes      | N/A               |
+| `cloud_endpoint`    | The endpoint URL of Yatai or BentoCloud                                  | Yes      | N/A               |
+| `bentoml_version`   | The version of bentoml to use                                            | No       | latest            |
+| `bento_version`     | The version of Bento Build or leave it empty to use a random string      | No       | Generated         |
+| `bento_tag`         | Whether to build the bento with this action or not.                      | No       | True              |
+| `bento_tag`         | Optional tag to pass for this action. This is required when `build=true` | No       | N/A               |
+| `bento_version`     | The version of Bento Build or leave it empty to use a random string      | No       | Generated         |
+| `deployment_config` | The path to the JSON deployment config                                   | No       | `deployment.json` |
+| `deployment_name`   | The name of the deployment, required if action is 'update'               | No       | N/A               |
+| `action`            | Choose the action for the deployment: 'create', 'update', 'skip'         | No       | 'update'          |
 
 ## Action Outputs
 
