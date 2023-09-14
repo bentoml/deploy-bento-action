@@ -11,6 +11,14 @@ inputs:
   cloud_endpoint:
     description: "The endpoint URL of Yatai or BentoCloud"
     required: true
+  build:
+    description: "Whether to build the bento"
+    required: false
+    default: true
+  bento_tag:
+    description: "Optional bento tag. This is required if 'build' is set to True"
+    required: false
+    default: ""
   bento_version:
     description: "The version of Bento Build or leave it empty to use a random string"
     required: false
@@ -31,13 +39,13 @@ inputs:
 outputs:
   bento_repository:
     description: "The name of the Bento repository"
-    value: ${{ steps.build.outputs.BENTO_NAME }}
+    value: ${{ steps.build.outputs.bento-name }}
   bento_version:
     description: "The version of the built Bento"
-    value: ${{ steps.build.outputs.BENTO_VERSION }}
+    value: ${{ steps.build.outputs.bento-version }}
   bento_tag:
     description: "The tag of the Bento"
-    value: ${{ steps.build.outputs.BENTO_TAG }}
+    value: ${{ steps.build.outputs.bento-tag }}
 
 runs:
   using: "composite"
@@ -57,33 +65,25 @@ runs:
       shell: bash
       run: bentoml models pull
 
-    - name: Build and push
+    - uses: bentoml/build-bento-action@v1
       id: build
+      if: inputs.build == true
+      with:
+        version: ${{ inputs.bento_version }}
+
+    - name: Push to BentoCloud
       shell: bash
-      run: |
-        if [[ -n "${{ inputs.bento_version }}" ]]; then
-          build_args=(--version ${{ inputs.bento_version }})
-        else
-          build_args=()
-        fi
-        bento_tag=$(bentoml build -o tag ${build_args[@]})
-        bento_tag=${bento_tag##__tag__:}
-        echo "BENTO_TAG=$bento_tag" >> $GITHUB_OUTPUT
-        echo "BENTO_NAME=$(echo $bento_tag | cut -d: -f1)" >> $GITHUB_OUTPUT
-        echo "BENTO_VERSION=$(echo $bento_tag | cut -d: -f2)" >> $GITHUB_OUTPUT
-        bentoml push $bento_tag
+      run: bentoml push ${{ steps.build.outputs.bento-tag || inputs.bento_tag }}
 
     - name: Update deployment
       shell: bash
       if: inputs.action == 'update'
-      run: |
-        bentoml deployment update --name ${{ inputs.deployment_name }} --bento ${{ steps.build.outputs.BENTO_TAG }}
+      run: bentoml deployment update --name ${{ inputs.deployment_name }} --bento ${{ steps.build.outputs.bento-tag }}
 
     - name: Create deployment
       shell: bash
       if: inputs.action == 'create'
-      run: |
-        bentoml deployment create -f ${{ inputs.deployment_config }}
+      run: bentoml deployment create -f ${{ inputs.deployment_config }}
 
 branding:
   icon: upload-cloud
