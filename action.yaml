@@ -63,6 +63,7 @@ runs:
 
     - name: Pull models
       shell: bash
+      if: inputs.build == true
       run: bentoml models pull
 
     - uses: bentoml/build-bento-action@v1
