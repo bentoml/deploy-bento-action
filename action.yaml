@@ -74,6 +74,7 @@ runs:
 
     - name: Push to BentoCloud
       shell: bash
+      if: inputs.build == true
       run: bentoml push ${{ steps.build.outputs.bento-tag || inputs.bento_tag }}
 
     - name: Update deployment
