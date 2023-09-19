@@ -66,7 +66,7 @@ runs:
       if: ${{ inputs.build == 'true' }} 
       run: bentoml models pull
 
-    - uses: bentoml/build-bento-action@v1
+    - uses: bentoml/build-bento-action@main
       id: build
       if: ${{ inputs.build == 'true' }} 
       with:
