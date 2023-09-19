@@ -63,28 +63,28 @@ runs:
 
     - name: Pull models
       shell: bash
-      if: inputs.build == true
+      if: ${{ inputs.build == true }} 
       run: bentoml models pull
 
     - uses: bentoml/build-bento-action@v1
       id: build
-      if: inputs.build == true
+      if: ${{ inputs.build == true }} 
       with:
         version: ${{ inputs.bento_version }}
 
     - name: Push to BentoCloud
       shell: bash
-      if: inputs.build == true
+      if: ${{ inputs.build == true }} 
       run: bentoml push ${{ steps.build.outputs.bento-tag || inputs.bento_tag }}
 
     - name: Update deployment
       shell: bash
-      if: inputs.action == 'update'
+      if: ${{ inputs.action == 'update' }}
       run: bentoml deployment update --name ${{ inputs.deployment_name }} --bento ${{ steps.build.outputs.bento-tag }}
 
     - name: Create deployment
       shell: bash
-      if: inputs.action == 'create'
+      if: ${{ inputs.action == 'create' }}
       run: bentoml deployment create -f ${{ inputs.deployment_config }}
 
 branding:
