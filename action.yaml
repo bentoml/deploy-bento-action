@@ -5,6 +5,10 @@ inputs:
     description: The version of BentoML to use. Leave it empty to use the latest version
     required: false
     default: ""
+  python_version:
+    description: "The version of Python to use."
+    required: false
+    default: "3.11"
   cloud_api_token:
     description: "An API token generated from the cloud console"
     required: true
@@ -52,7 +56,7 @@ runs:
   steps:
     - uses: bentoml/setup-bentoml-action@v1
       with:
-        python-version: "3.8"
+        python-version: ${{ inputs.python_version }}
         bentoml-version: ${{ inputs.bentoml_version }}
 
     - name: Login to Bento Cloud
